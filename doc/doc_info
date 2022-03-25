@@ -1,0 +1,230 @@
+package com.example.testfit;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.data.Bucket;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "YYYM";
+    private static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
+    public FitnessOptions fitnessOptions ;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+/*       if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
+                    MY_PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION);
+        }*/
+        fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.AGGREGATE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_DISTANCE_DELTA, FitnessOptions.ACCESS_READ)
+                .build();
+
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
+            GoogleSignIn.requestPermissions(
+                    this,
+                    REQUEST_OAUTH_REQUEST_CODE,
+                    GoogleSignIn.getLastSignedInAccount(this),
+                    fitnessOptions);
+            Log.d("YYYM", "onCreate: ");
+            //accessGoogleFit();
+        } else {
+            Log.d("YYYM", "onCreate: else");
+            accessGoogleFit();
+        }
+
+
+        // Read the data that's been collected throughout the past week.
+/*        ZonedDateTime endTime = LocalDateTime.now().atZone(ZoneId.systemDefault());
+        ZonedDateTime startTime = endTime.minusWeeks(1);
+        Log.i(TAG, "Range Start: $startTime");
+        Log.i(TAG, "Range End: $endTime");
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                // The data request can specify multiple data types to return,
+                // effectively combining multiple data queries into one call.
+                // This example demonstrates aggregating only one data type.
+                .aggregate(DataType.AGGREGATE_STEP_COUNT_DELTA)
+                // Analogous to a "Group By" in SQL, defines how data should be
+                // aggregated.
+                // bucketByTime allows for a time span, while bucketBySession allows
+                // bucketing by sessions.
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                .build();
+
+        DataReadRequest readRequest2 = new DataReadRequest.Builder()
+                .aggregate(DataType.AGGREGATE_CALORIES_EXPENDED)
+                .bucketByActivityType(1, TimeUnit.SECONDS)
+                .setTimeRange(startTime.toEpochSecond(), endTime.toEpochSecond(), TimeUnit.SECONDS)
+                .build();*/
+
+
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
+                //subscribe();
+                Log.d("YYYM", "onActivityResult: "+requestCode);
+                accessGoogleFit();
+            }
+        }
+        Log.d("YYYM", "onActivityResult_: "+resultCode);
+    }
+
+    private void accessGoogleFit() {
+
+        //LocalDateTime end = LocalDateTime.now();
+        //LocalDateTime start = end.minusYears(1);
+        //long endSeconds = end.atZone(ZoneId.systemDefault()).toEpochSecond();
+        //long startSeconds = start.atZone(ZoneId.systemDefault()).toEpochSecond();
+        //Log.d("YYYM", "accessGoogleFit: "+startSeconds+" , "+endSeconds);
+        final Calendar cal = Calendar.getInstance();
+        Date now = Calendar.getInstance().getTime();
+        cal.setTime(now);
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 0,0,0);
+        long startTime = cal.getTimeInMillis();
+        Log.d("YYYM", "startTime: "+startTime);
+
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), 23,59,59);
+        long endTime = cal.getTimeInMillis();
+        Log.d("YYYM", "endTime: "+endTime);
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED)
+                .setTimeRange(startTime, endTime, TimeUnit.SECONDS)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .build();
+        GoogleSignInAccount account = GoogleSignIn.getAccountForExtension(this, fitnessOptions);
+        Fitness.getHistoryClient(this, account)
+                .readData(readRequest)
+                .addOnSuccessListener(
+                        new OnSuccessListener<DataReadResponse>(){
+                            @Override
+                            public void onSuccess(DataReadResponse dataReadResponse) {
+                                Log.d("YYYM", "onSuccess: "+dataReadResponse.getBuckets().size()) ;
+                                float totalCal =0;
+                                int totalCalories =0;
+                                float totalDis = 0;
+                                int totalDistance=0;
+                                int totalStep = 0;
+                                long totalStepTimeNumber =0;
+                                if (dataReadResponse.getBuckets().size() > 0)
+                                {
+                                    for (Bucket bucket : dataReadResponse.getBuckets())
+                                    {
+                                        List<DataSet> dataSets = bucket.getDataSets();
+                                        for (DataSet dataSet : dataSets){
+                                            for (DataPoint datapoint : dataSet.getDataPoints())
+                                            {
+                                                Log.d("YYYM", "onSuccess: " + datapoint.getDataType().getName());
+                                                for (Field field : datapoint.getDataType().getFields())
+                                                {
+                                                    Log.d("YYYM", "onSuccess: "+field.getName());
+                                                    Log.d("YYYM", "onSuccess: "+datapoint.getValue(field));
+                                                    Log.d("YYYM", "onSuccess: "+datapoint.getOriginalDataSource().getDataType()
+                                                    + ", "+datapoint.getOriginalDataSource().getStreamName()
+                                                    + ", "+datapoint.getOriginalDataSource().getDevice());
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+/*                                    DataSet dataSetCalor = dataReadResponse.getDataSet(DataType.TYPE_CALORIES_EXPENDED);
+                                    DataSet dataStepCnt  = dataReadResponse.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
+                                    DataSet dataDistance = dataReadResponse.getDataSet(DataType.TYPE_DISTANCE_DELTA);
+
+                                    //칼로리계산
+                                    for (DataPoint dpCal : dataSetCalor.getDataPoints()){
+                                        for (Field field : dpCal.getDataType().getFields())
+                                        {
+                                            totalCal += dpCal.getValue(field).asFloat();
+                                            Log.d(TAG, "totalCal: "+totalCal);
+                                        }
+                                    }
+                                    totalCalories = (int)Math.floor(totalCal);
+                                    Log.d(TAG, "totalCalories: "+totalCalories);
+
+                                    //거리 계산
+                                    for (DataPoint dpDis : dataDistance.getDataPoints()){
+                                        for (Field field : dpDis.getDataType().getFields()){
+                                            totalDis += dpDis.getValue(field).asFloat();
+                                            Log.d(TAG, "totalDis: "+totalDis);
+                                        }
+                                    }
+                                    totalDistance = (int) Math.floor(totalDis);
+                                    Log.d(TAG, "totalDistance: "+totalDistance);
+
+                                    //스텝계산
+                                    for (DataPoint dpStep : dataStepCnt.getDataPoints()){
+                                        totalStepTimeNumber += dpStep.getEndTime(TimeUnit.MILLISECONDS);
+                                        Log.d(TAG, "totalStepTimeNumber: "+totalStepTimeNumber);
+                                        for (Field field : dpStep.getDataType().getFields()){
+                                            totalStep += dpStep.getValue(field).asInt();
+                                            Log.d(TAG, "totalStep: "+totalStep);
+                                        }
+                                    }*/
+                                }
+                                //Log.d(TAG, "cal: "+totalCal +", dis:"+totalDis +" ,step:"+totalStep);
+                            }
+                        }
+                )
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("YYYM", "onFailure: "+e);
+                            }
+                        }
+                );
+    }
+
+}
