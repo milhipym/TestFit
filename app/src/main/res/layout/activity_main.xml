@@ -1,19 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_left"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_top"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_second"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_third"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidline_forth"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65"/>
+<!--최상단 타이틀-->
+    <ImageButton
+        android:id="@+id/back_working"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/guidline_left"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_top"/>
     <TextView
-        android:id="@+id/tv1"
-        android:layout_width="262dp"
-        android:layout_height="44dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/working_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오늘 하루 걸음 수"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/back_working"
+        app:layout_constraintRight_toLeftOf="@+id/guidline_right"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_top"/>
+<!--일/주/월 버튼-->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/day_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="일"
+        android:background="#00ff0000"
+        android:backgroundTint="#0000ff"
+        app:layout_constraintTop_toTopOf="@+id/guidline_top"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_second"
+        app:layout_constraintLeft_toLeftOf="@+id/guidline_left"
+        app:layout_constraintRight_toLeftOf="@+id/week_btn"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/week_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="주"
+        android:background="#00ff0000"
+        android:backgroundTint="#0000ff"
+        app:layout_constraintTop_toTopOf="@+id/guidline_top"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_second"
+        app:layout_constraintLeft_toRightOf="@+id/day_btn"
+        app:layout_constraintRight_toRightOf="@+id/month_btn"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/month_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="월"
+        android:background="#00ff0000"
+        android:backgroundTint="#0000ff"
+        app:layout_constraintTop_toTopOf="@+id/guidline_top"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_second"
+        app:layout_constraintLeft_toRightOf="@+id/week_btn"
+        app:layout_constraintRight_toRightOf="@+id/guidline_right"/>
+<!--선택된 날짜 표시-->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/working_date"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/guidline_second"
+        app:layout_constraintLeft_toLeftOf="@+id/guidline_left"
+        app:layout_constraintRight_toRightOf="@+id/guidline_right"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_third"/>
+<!---->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

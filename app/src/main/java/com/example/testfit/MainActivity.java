@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     String timeTotalStep="0";
     long totalTime = 0;
     int totalStep = 0;
-    float totalCal = 0;
+    int totalCal = 0;
     float totalDis = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                             for (Field field : dpCal.getDataType().getFields())
                             {
                                 totalCal += dpCal.getValue(field).asFloat();
-                                Log.d("YYYM", "totalCal: "+totalCal);
+                                Log.d("YYYM", "totalCal: "+totalCal+" , eachStep:"+dpCal.getValue(field).asFloat());
                             }
                         }
                         int totalCalories = (int)Math.floor(totalCal);
