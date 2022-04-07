@@ -2,17 +2,18 @@ package com.example.testfit;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.testfit.util.PermissionCheck;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -26,78 +27,83 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int REQUEST_CHECK_PERMISSION_RECOGNITION = 10001;
+    public static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
     private static final String TAG = "YYYM";
-    private static final int REQUEST_OAUTH_REQUEST_CODE = 1001;
     public FitnessOptions fitnessOptions ;
     String timeTotalStep="0";
     long totalTime = 0;
     int totalStep = 0;
     int totalCal = 0;
     float totalDis = 0;
+
+    public WorkingCount workingCount;
+    public static TextView tv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //운동권한정책
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
-            != PackageManager.PERMISSION_GRANTED)
-        {
-            requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION},0);
-        }
+        initSetting();
+        workingCount = new WorkingCount();
+        PermissionCheck permissionCheckc = new PermissionCheck();
+        permissionCheckc.checkRecognition(getApplicationContext(), MainActivity.this, workingCount);
 
-        // 필요한 권한들 정의
-        FitnessOptions fitnessOptions =
-                FitnessOptions.builder()
-                        .addDataType(DataType.TYPE_CALORIES_EXPENDED)
-                        .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
-                        .addDataType(DataType.TYPE_DISTANCE_DELTA)
-                        .build();
-
-        if(!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
-            GoogleSignIn.requestPermissions(
-                    this,
-                    REQUEST_OAUTH_REQUEST_CODE,
-                    GoogleSignIn.getLastSignedInAccount(this),
-                    fitnessOptions);
-        } else {
-            Fitness.getRecordingClient(this,
-                    GoogleSignIn.getLastSignedInAccount(this))
-                    .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-                    .addOnCompleteListener(
-                            new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.i(TAG, "Successfully subscribed!");
-                                        readData();
-                                    } else {
-                                        Log.w(TAG, "There was a problem subscribing.", task.getException());
-                                    }
-                                }
-                            });
-        }
 
     }//end onCreate
+
+    private void initSetting() {
+        tv = findViewById(R.id.working_date);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // 로그인 성공시
+        Log.d("YYYM", "onActivityResult: "+resultCode+", data:"+data);
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
-                subscribe();
-                readData();
+        if (requestCode == REQUEST_CHECK_PERMISSION_RECOGNITION){
+            Log.d("YYYM", "onActivityResult 운동권한 : "+resultCode+", data:"+data);
+            workingCount.checkFitnessPermission(getApplicationContext(), MainActivity.this);
+        }
+        else if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Log.d("YYYM", "onActivityResult:  구글핏권한: " + resultCode + ", :" + data);
+                workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA);
+                //readData();
+            }else if (resultCode == Activity.RESULT_CANCELED)
+            {
+                Log.d("YYYM", "onActivityResult:  구글핏권한 취소: " + resultCode + ", :" + data);
             }
         }
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("YYYM", "onRequestPermissionsResult: "+requestCode+" , grantResults:"+grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_CHECK_PERMISSION_RECOGNITION:
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    workingCount.checkFitnessPermission(getApplicationContext(), MainActivity.this);
+                }
+                else
+                {
+                }
+            break;
+
+        }
+    }
+
 
     private void readData() {
 
@@ -116,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         long endTime = cal.getTimeInMillis();
 
         Fitness.getHistoryClient(this,
-                GoogleSignIn.getLastSignedInAccount(this))
+                Objects.requireNonNull(GoogleSignIn.getLastSignedInAccount(this)))
                 .readData(new DataReadRequest.Builder()
                         .read(DataType.TYPE_STEP_COUNT_DELTA) // Raw 걸음 수
                         .read(DataType.TYPE_CALORIES_EXPENDED)// 칼로리
@@ -195,29 +201,4 @@ public class MainActivity extends AppCompatActivity {
                 });
 
     }
-
-
-    public void subscribe()
-    {
-        Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
-        .subscribe(DataType.TYPE_STEP_COUNT_CUMULATIVE)
-        .addOnCompleteListener(
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful())
-                        {
-                            Log.d("YYYM", "onComplete: " + task.isSuccessful());
-                        }
-                        else{
-                            Log.d("YYYM", "onFail: " + task.isSuccessful());
-                        }
-                    }
-                }
-
-        );
-    }
-
-
-
 }
