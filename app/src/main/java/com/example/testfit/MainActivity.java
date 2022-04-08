@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.testfit.util.PermissionCheck;
+import com.example.testfit.util.TestUi;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -53,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initSetting();
-        workingCount = new WorkingCount();
+        //TestUi testUi = new TestUi(tv);
+        //TestUi testUi = new TestUi();
+        workingCount = new WorkingCount(getApplicationContext(), MainActivity.this);
         PermissionCheck permissionCheckc = new PermissionCheck();
         permissionCheckc.checkRecognition(getApplicationContext(), MainActivity.this, workingCount);
 
@@ -76,10 +79,15 @@ public class MainActivity extends AppCompatActivity {
         else if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 Log.d("YYYM", "onActivityResult:  구글핏권한: " + resultCode + ", :" + data);
-                workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA);
+                workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA, getApplicationContext());
+                workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
+                workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
                 //readData();
             }else if (resultCode == Activity.RESULT_CANCELED)
             {
+                workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA, getApplicationContext());
+                workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
+                workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
                 Log.d("YYYM", "onActivityResult:  구글핏권한 취소: " + resultCode + ", :" + data);
             }
         }

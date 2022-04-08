@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.dynamicanimation.animation.SpringAnimation;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
@@ -32,10 +33,12 @@ public class WorkingCount {
     private Activity mActivity;
     private MainActivity mMainActivity;
 
-    private int dailyStepTotal =0;
-
-    public WorkingCount() {
-
+    private int dailyStepTotal = 0;
+    private int dailyCalTotal = 0;
+    private int dailtyDistanceTotal = 0;
+    public WorkingCount(Context applicationContext, MainActivity mainActivity) {
+        mContext = applicationContext;
+        mActivity = mainActivity;
     }
 
     public void checkFitnessPermission(Context context, Activity activity) {
@@ -61,12 +64,16 @@ public class WorkingCount {
         //권한 기승인시
         else
         {
-            subscribe(DataType.TYPE_STEP_COUNT_DELTA);
+            subscribe(DataType.TYPE_STEP_COUNT_DELTA, mContext);
+            subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
+            subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
         }
     }
 
-    public void subscribe(DataType dataType)
+    public void subscribe(DataType dataType, Context mContext)
     {
+        this.mContext = mContext;
+
         Fitness.getRecordingClient(mActivity, GoogleSignIn.getLastSignedInAccount(mContext))
             .subscribe(dataType)
             .addOnCompleteListener(
@@ -104,12 +111,14 @@ public class WorkingCount {
                                 if (!"user_input".equals(dp.getOriginalDataSource().getStreamName()))
                                 {
                                     int step = dp.getValue(field).asInt();
-                                    dailyStepTotal += step;
+                                    if (dataType == DataType.TYPE_STEP_COUNT_DELTA){ dailyStepTotal += step; }
+                                    if (dataType == DataType.TYPE_DISTANCE_DELTA){ dailyCalTotal += step; }
+                                    if (dataType == DataType.TYPE_CALORIES_EXPENDED){ dailyCalTotal += step;}
+
                                 }
                             }
                         }
-                        TextView tv2 = ((MainActivity)mContext).findViewById(R.id.working_date);
-                        tv2.setText(dailyStepTotal);
+                        tv.setText(Integer.toString(dailyStepTotal) +", "+Integer.toString(dailyCalTotal)+ " , "+Integer.toString(dailtyDistanceTotal));
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -119,6 +128,9 @@ public class WorkingCount {
                     }
                 });
 
+
+        subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
+        subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
     }
 
 

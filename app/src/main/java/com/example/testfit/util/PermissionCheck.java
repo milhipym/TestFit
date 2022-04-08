@@ -49,7 +49,7 @@ public class PermissionCheck extends AppCompatActivity {
         }
         else
         {
-            workingCount = new WorkingCount();
+            workingCount = new WorkingCount(mContext, (MainActivity) mActivity);
             workingCount.checkFitnessPermission(mContext, mActivity);
         }
     }
