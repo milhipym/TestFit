@@ -1,7 +1,6 @@
 package com.example.testfit;
 
 import static com.example.testfit.MainActivity.REQUEST_OAUTH_REQUEST_CODE;
-import static com.example.testfit.MainActivity.tv;
 
 import android.app.Activity;
 import android.content.Context;
@@ -65,8 +64,8 @@ public class WorkingCount {
         else
         {
             subscribe(DataType.TYPE_STEP_COUNT_DELTA, mContext);
-            subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
-            subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
+            //subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
+            //subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
         }
     }
 
@@ -112,13 +111,14 @@ public class WorkingCount {
                                 {
                                     int step = dp.getValue(field).asInt();
                                     if (dataType == DataType.TYPE_STEP_COUNT_DELTA){ dailyStepTotal += step; }
-                                    if (dataType == DataType.TYPE_DISTANCE_DELTA){ dailyCalTotal += step; }
-                                    if (dataType == DataType.TYPE_CALORIES_EXPENDED){ dailyCalTotal += step;}
+                                    //if (dataType == DataType.TYPE_DISTANCE_DELTA){ dailyCalTotal += step; }
+                                    //if (dataType == DataType.TYPE_CALORIES_EXPENDED){ dailyCalTotal += step;}
 
                                 }
                             }
                         }
-                        tv.setText(Integer.toString(dailyStepTotal) +", "+Integer.toString(dailyCalTotal)+ " , "+Integer.toString(dailtyDistanceTotal));
+                        mMainActivity.updateProgressBarStep(dailyStepTotal);
+                        //tv.setText(Integer.toString(dailyStepTotal) +", "+Integer.toString(dailyCalTotal)+ " , "+Integer.toString(dailtyDistanceTotal));
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -129,8 +129,8 @@ public class WorkingCount {
                 });
 
 
-        subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
-        subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
+        //subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
+        //subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
     }
 
 

@@ -47,11 +47,12 @@
 <!--최상단 타이틀-->
     <ImageButton
         android:id="@+id/back_working"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/back"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/pngwing"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="@+id/guidline_left"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guidline_left"
         app:layout_constraintBottom_toTopOf="@+id/guidline_top"/>
     <TextView
         android:id="@+id/working_title"
@@ -111,5 +112,29 @@
         app:layout_constraintRight_toRightOf="@+id/guidline_right"
         app:layout_constraintBottom_toTopOf="@+id/guidline_third"/>
 <!---->
+    <ProgressBar
+        android:id="@+id/stepCircle"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:indeterminateOnly="false"
+        android:progressDrawable="@drawable/circle"
+        android:progress="20"
+        app:layout_constraintTop_toBottomOf="@id/guidline_third"
+        app:layout_constraintLeft_toLeftOf="@+id/guidline_left"
+        app:layout_constraintRight_toRightOf="@+id/guidline_right"
+        app:layout_constraintBottom_toTopOf="@+id/guidline_forth"
+        />
+
+    <TextView
+        android:id="@+id/stepCnt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="232"
+        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toBottomOf="@+id/stepCircle"
+        app:layout_constraintEnd_toEndOf="@+id/stepCircle"
+        app:layout_constraintStart_toStartOf="@+id/stepCircle"
+        app:layout_constraintTop_toTopOf="@+id/stepCircle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

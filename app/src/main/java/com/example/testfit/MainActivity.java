@@ -1,20 +1,18 @@
 package com.example.testfit;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.example.testfit.util.PermissionCheck;
-import com.example.testfit.util.TestUi;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -24,9 +22,7 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -47,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     public WorkingCount workingCount;
     public static TextView tv;
+    public static TextView tv_totalCnt;
+    public static ProgressBar pr_totalCnt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void initSetting() {
         tv = findViewById(R.id.working_date);
+        tv_totalCnt = findViewById(R.id.stepCnt);
+        pr_totalCnt = findViewById(R.id.stepCircle);
+
+        tv_totalCnt.setText("dfdfdffdfdf");
     }
 
     @Override
@@ -80,14 +82,14 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 Log.d("YYYM", "onActivityResult:  구글핏권한: " + resultCode + ", :" + data);
                 workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA, getApplicationContext());
-                workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
-                workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
+                //workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
+                //workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
                 //readData();
             }else if (resultCode == Activity.RESULT_CANCELED)
             {
                 workingCount.subscribe(DataType.TYPE_STEP_COUNT_DELTA, getApplicationContext());
-                workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
-                workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
+                //workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
+                //workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
                 Log.d("YYYM", "onActivityResult:  구글핏권한 취소: " + resultCode + ", :" + data);
             }
         }
@@ -112,6 +114,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateProgressBarStep(Integer stepCnt){
+        int goalStep = 1000;
+        int userStep = stepCnt;
+        int percentValue = 0;
+
+        percentValue = (int)( (double)userStep/ (double)goalStep * 100.0 );
+        Log.d("YYYM", "updateProgressBarStep: "+percentValue + " , userStep:"+userStep);
+
+        if(tv_totalCnt == null){
+            //Toast.makeText(getApplicationContext(), "dd:", Toast.LENGTH_SHORT).show();
+            tv_totalCnt = findViewById(R.id.stepCnt);
+            tv_totalCnt.setText(userStep);
+            pr_totalCnt.setProgress(percentValue);
+        }
+        else {
+            tv_totalCnt.setText(Integer.toString(userStep));
+            pr_totalCnt.setProgress(percentValue);
+        }
+    }
 
     private void readData() {
 

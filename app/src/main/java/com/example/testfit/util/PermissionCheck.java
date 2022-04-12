@@ -38,7 +38,7 @@ public class PermissionCheck extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACTIVITY_RECOGNITION)
                 != PackageManager.PERMISSION_GRANTED)
         {
-            Toast.makeText(mContext,"ddfdf",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext,"ddfdf",Toast.LENGTH_SHORT).show();
             mActivity.requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
                     REQUEST_CHECK_PERMISSION_RECOGNITION);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
