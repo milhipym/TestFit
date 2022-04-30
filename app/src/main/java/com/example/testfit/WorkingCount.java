@@ -1,15 +1,11 @@
 package com.example.testfit;
 
-import static com.example.testfit.MainActivity.REQUEST_OAUTH_REQUEST_CODE;
-
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.dynamicanimation.animation.SpringAnimation;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
@@ -23,11 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import org.w3c.dom.Text;
-
-import java.io.File;
-
-public class WorkingCount {
+public class WorkingCount extends MainActivity{
     private Context mContext;
     private Activity mActivity;
     private MainActivity mMainActivity;
@@ -111,14 +103,11 @@ public class WorkingCount {
                                 {
                                     int step = dp.getValue(field).asInt();
                                     if (dataType == DataType.TYPE_STEP_COUNT_DELTA){ dailyStepTotal += step; }
-                                    //if (dataType == DataType.TYPE_DISTANCE_DELTA){ dailyCalTotal += step; }
-                                    //if (dataType == DataType.TYPE_CALORIES_EXPENDED){ dailyCalTotal += step;}
 
                                 }
                             }
                         }
-                        mMainActivity.updateProgressBarStep(dailyStepTotal);
-                        //tv.setText(Integer.toString(dailyStepTotal) +", "+Integer.toString(dailyCalTotal)+ " , "+Integer.toString(dailtyDistanceTotal));
+                        mMainActivity.updateProgressBarStep(dailyStepTotal, dataType);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -127,13 +116,5 @@ public class WorkingCount {
                         Toast.makeText(mContext, "addOnFailureListener"+e, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
-        //subscribe(DataType.TYPE_DISTANCE_DELTA, mContext);
-        //subscribe(DataType.TYPE_CALORIES_EXPENDED, mContext);
     }
-
-
-
-
 }

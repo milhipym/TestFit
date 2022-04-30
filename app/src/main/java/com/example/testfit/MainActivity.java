@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     public WorkingCount workingCount;
     public static TextView tv;
     public static TextView tv_totalCnt;
+    public static TextView tv_caloryCnt;
+    public static TextView tv_distanceCnt;
     public static ProgressBar pr_totalCnt;
 
     @Override
@@ -65,8 +67,9 @@ public class MainActivity extends AppCompatActivity {
         tv = findViewById(R.id.working_date);
         tv_totalCnt = findViewById(R.id.stepCnt);
         pr_totalCnt = findViewById(R.id.stepCircle);
+        tv_caloryCnt = findViewById(R.id.tv_caloryCnt);
+        tv_distanceCnt = findViewById(R.id.tv_distanceCnt);
 
-        tv_totalCnt.setText("dfdfdffdfdf");
     }
 
     @Override
@@ -114,24 +117,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateProgressBarStep(Integer stepCnt){
+    public void updateProgressBarStep(Integer stepCnt, DataType dataType){
         int goalStep = 1000;
         int userStep = stepCnt;
-        int percentValue = 0;
+        int percentValue;
 
-        percentValue = (int)( (double)userStep/ (double)goalStep * 100.0 );
-        Log.d("YYYM", "updateProgressBarStep: "+percentValue + " , userStep:"+userStep);
+        if (dataType == DataType.TYPE_STEP_COUNT_DELTA)
+        {
+            percentValue = (int)( (double)userStep/ (double)goalStep * 100.0 );
+            Log.d("YYYM", "updateProgressBarStep: "+percentValue + " , userStep:"+userStep);
 
-        if(tv_totalCnt == null){
-            //Toast.makeText(getApplicationContext(), "dd:", Toast.LENGTH_SHORT).show();
-            tv_totalCnt = findViewById(R.id.stepCnt);
-            tv_totalCnt.setText(userStep);
-            pr_totalCnt.setProgress(percentValue);
-        }
-        else {
-            tv_totalCnt.setText(Integer.toString(userStep));
-            pr_totalCnt.setProgress(percentValue);
-        }
+            if(tv_totalCnt == null){
+                //Toast.makeText(getApplicationContext(), "dd:", Toast.LENGTH_SHORT).show();
+                tv_totalCnt = findViewById(R.id.stepCnt);
+                tv_totalCnt.setText(userStep);
+                pr_totalCnt.setProgress(percentValue);
+                //workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
+            }
+            else {
+                tv_totalCnt.setText(Integer.toString(userStep));
+                pr_totalCnt.setProgress(percentValue);
+                //workingCount.subscribe(DataType.TYPE_CALORIES_EXPENDED, getApplicationContext());
+
+            }
+        }/*else if(dataType == DataType.TYPE_CALORIES_EXPENDED)
+        {
+            tv_caloryCnt.setText(stepCnt);
+            workingCount.subscribe(DataType.TYPE_DISTANCE_DELTA, getApplicationContext());
+        }else if (dataType == DataType.TYPE_DISTANCE_DELTA)
+        {
+            tv_distanceCnt.setText(stepCnt);
+        }*/
+
     }
 
     private void readData() {

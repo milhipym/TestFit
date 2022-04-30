@@ -138,7 +138,7 @@
         app:layout_constraintTop_toTopOf="@+id/stepCircle" />
 
     <TextView
-        android:id="@+id/caloryCnt"
+        android:id="@+id/tv_caloryCnt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1249 Cal"
@@ -147,17 +147,17 @@
         app:layout_constraintTop_toBottomOf="@+id/stepCircle"
         app:layout_constraintBottom_toTopOf="@+id/guidline_forth"
         app:layout_constraintLeft_toRightOf="@+id/guidline_left"
-        app:layout_constraintRight_toLeftOf="@+id/distanceCnt"/>
+        app:layout_constraintRight_toLeftOf="@+id/tv_distanceCnt"/>
 
     <TextView
-        android:id="@+id/distanceCnt"
+        android:id="@+id/tv_distanceCnt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0.11 Km"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintTop_toBottomOf="@+id/stepCircle"
         app:layout_constraintBottom_toTopOf="@+id/guidline_forth"
-        app:layout_constraintLeft_toRightOf="@+id/caloryCnt"
+        app:layout_constraintLeft_toRightOf="@+id/tv_caloryCnt"
         app:layout_constraintRight_toLeftOf="@+id/guidline_right"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
